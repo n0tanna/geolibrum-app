@@ -49,7 +49,9 @@ const LogScreen = (props) => {
   const Item = ({ item }) => (
     <TouchableOpacity style={styles.log}>
       <Image style={styles.logImages} source={item.type_image} />
-      <Text style={styles.idText}>{item.id}</Text>
+      <View style={styles.idArea}>
+        <Text style={styles.idText}>{item.id}</Text>
+      </View>
       <Text style={styles.nameText}>{item.name}</Text>
     </TouchableOpacity>
   );
@@ -70,7 +72,9 @@ const LogScreen = (props) => {
             keyExtractor={(item) => item.id}
           />
           <View style={styles.add}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+                navigation.navigate("ChooseType");
+              }}>
               <Text style={styles.plus}>+</Text>
             </TouchableOpacity>
           </View>

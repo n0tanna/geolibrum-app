@@ -69,6 +69,18 @@ export default styles = StyleSheet.create({
     width: 40,
     margin: -2
   },
+  idArea: {
+    backgroundColor: "#D77A61",
+    marginRight: 0,
+    alignItems: "center",
+    marginTop: -36.5,
+    marginBottom: -3.2,
+    paddingLeft: 6,
+    paddingTop: 2.5,
+    paddingRight: 6,
+    paddingBottom: 3.5,
+    marginLeft: 300
+  },
   log: {
       borderColor: "#D77A61",
       borderWidth: 2,
@@ -79,15 +91,17 @@ export default styles = StyleSheet.create({
       marginBottom: 2,
   },
   idText: {
-    paddingLeft: 300,
-    marginRight: 5,
-    marginTop: -30,
-    fontSize: 20
+    fontSize: 20,
+    color: "#EFF1F3",
+    fontFamily: "NotoSans"
   },
   nameText: {
     paddingLeft: 45,
-    marginTop: -28,
-    marginBottom: 10
+    marginTop: -30,
+    marginBottom: 4,
+    fontFamily: "NotoSans",
+    color: "#223843",
+    fontSize: 20
   },
   back: {
     height: 60,

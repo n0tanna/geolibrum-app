@@ -19,24 +19,24 @@ const LogScreen = (props) => {
   const { navigation } = props;
 
   const [list, setList] = useState([
-    { id: 1, type_id: 0, type_image: "", name: "Fossil" },
-    { id: 2, type_id: 1, type_image: "", name: "Mineral" },
+    { id: 1, type_id: 1, type_image: "", name: "Fossil" },
+    { id: 2, type_id: 0, type_image: "", name: "Mineral" },
     { id: 3, type_id: 2, type_image: "", name: "Rock" },
-    { id: 4, type_id: 1, type_image: "", name: "Mineral" },
-    { id: 5, type_id: 0, type_image: "", name: "Fossil" },
-    { id: 6, type_id: 1, type_image: "", name: "Mineral" },
-    { id: 7, type_id: 0, type_image: "", name: "Fossil" },
+    { id: 4, type_id: 0, type_image: "", name: "Mineral" },
+    { id: 5, type_id: 1, type_image: "", name: "Fossil" },
+    { id: 6, type_id: 0, type_image: "", name: "Mineral" },
+    { id: 7, type_id: 1, type_image: "", name: "Fossil" },
     { id: 8, type_id: 2, type_image: "", name: "Rock" },
-    { id: 9, type_id: 0, type_image: "", name: "Fossil" },
-    { id: 10, type_id: 1, type_image: "", name: "Mineral" },
-    { id: 11, type_id: 0, type_image: "", name: "Fossil" },
+    { id: 9, type_id: 1, type_image: "", name: "Fossil" },
+    { id: 10, type_id: 0, type_image: "", name: "Mineral" },
+    { id: 11, type_id: 1, type_image: "", name: "Fossil" },
   ]);
 
   const loadImage = () => {
     list.forEach(function (log) {
-      if (log.type_id === 0) {
+      if (log.type_id === 1) {
         log.type_image = FossilLogo;
-      } else if (log.type_id === 1) {
+      } else if (log.type_id === 0) {
         log.type_image = MineralLogo;
       } else if (log.type_id === 2) {
         log.type_image = RockLogo;

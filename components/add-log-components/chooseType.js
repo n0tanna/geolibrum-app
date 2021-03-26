@@ -10,7 +10,6 @@ import Back from "../../assets/Photos/Illustrated/back-logo.png";
 
 const ChooseTypeScreen = (props) => {
   const { navigation } = props;
-  const [type, setType] = useState();
 
   return (
     <View style={styles.header}>
@@ -23,13 +22,25 @@ const ChooseTypeScreen = (props) => {
       <View style={styles.body}>
         <View style={styles.holder}>
           <Text style={styles.areaTitle}>Log Type</Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("AddFossil");
+            }}
+          >
             <Image style={styles.logImage} source={FossilLogo} />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("AddMineral");
+            }}
+          >
             <Image style={styles.logImage} source={MineralLogo} />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("AddRock");
+            }}
+          >
             <Image style={styles.logImage} source={RockLogo} />
           </TouchableOpacity>
           <View style={styles.back}>
@@ -40,7 +51,7 @@ const ChooseTypeScreen = (props) => {
             >
               <Image style={styles.imageArrow} source={Back} />
             </TouchableOpacity>
-            </View>
+          </View>
         </View>
       </View>
     </View>

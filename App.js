@@ -5,6 +5,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./components/home";
 import LogScreen from "./components/logs";
 import ChooseTypeScreen from "./components/add-log-components/chooseType";
+import AddRockScreen from "./components/add-log-components/addRockLog";
+import AddFossilScreen from "./components/add-log-components/addFossilLog";
+import AddMineralScreen from "./components/add-log-components/addMineralLog";
 import { useFonts } from "@use-expo/font";
 import AppLoading from "expo-app-loading";
 
@@ -41,6 +44,33 @@ const App = () => {
           name="ChooseType"
           children={(props) => (
             <ChooseTypeScreen
+              {...props}
+            />
+          )}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddRock"
+          children={(props) => (
+            <AddRockScreen
+              {...props}
+            />
+          )}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddMineral"
+          children={(props) => (
+            <AddMineralScreen
+              {...props}
+            />
+          )}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddFossil"
+          children={(props) => (
+            <AddFossilScreen
               {...props}
             />
           )}

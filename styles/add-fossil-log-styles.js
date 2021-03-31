@@ -11,6 +11,26 @@ export default styles = StyleSheet.create({
     height: 100,
     width: 100,
   },
+  imageLogoDate: {
+    height: 40,
+    width: 40,
+  },
+  imageLogosTop: {
+    height: 70,
+    width: 70,
+  },
+  imageBackground: {
+    backgroundColor: "#223843",
+  },
+  dropDown: {
+    paddingRight: 100,
+    paddingLeft: 100,
+    borderRadius: 10,
+    textAlign: "left"
+  },
+  text: {
+    marginTop: -500
+  },
   title: {
     fontSize: 60,
     fontFamily: "Philosopher",

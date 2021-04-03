@@ -106,7 +106,6 @@ export default styles = StyleSheet.create({
   back: {
     height: 60,
     width: 60,
-    marginRight: 350,
     backgroundColor: "#223843",
     marginBottom: -10,
     marginRight: 0,

@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
   Picker,
-  Button,
   TextInput,
-  ScrollView,
   SafeAreaView,
+  FlatList,
+  ScrollView,
   Text,
   TouchableOpacity,
 } from "react-native";
@@ -19,8 +19,10 @@ import Back from "../../assets/Photos/Illustrated/back-logo.png";
 
 import styles from "../../styles/add-fossil-log-styles.js";
 import TypeWriter from "react-native-typewriter";
+import * as ImagePicker from 'expo-image-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
+import { render } from "react-dom";
 
 const AddFossilScreen = (props) => {
   const { navigation } = props;
@@ -35,8 +37,68 @@ const AddFossilScreen = (props) => {
     upperTime: "",
     lowerTime: "",
     weight: "",
+    images: [],
+    certificate: [],
     colours: [],
   });
+
+  const [image, setImage] = useState(null);
+  const [hasFile, setHasFile] = useState(false);
+  const [hasColour, setHasColour] = useState(false);
+  const [colour, setColour] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Sorry, we need camera roll permissions to make this work!');
+        }
+      }
+    })();
+  }, []);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+      await setHasFile(true);
+    }
+  };
+
+  const takeImage = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+      await setHasFile(true);
+    }
+  };
+
+  const pickedDocument = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+      await setHasFile(true);
+    }
+  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -54,6 +116,24 @@ const AddFossilScreen = (props) => {
     newLog.date = year + "-" + month + "-" + day;
     hideDatePicker();
   };
+
+  const Item = ({ title }) => (
+    <View>
+      <Text>{title}</Text>
+    </View>
+  );
+
+  const renderColour = ({ item }) => <Item title={item} />;
+
+  const handleColour = (e) => {
+    setColour(e);
+  }
+
+  const addColour = async () => {
+    newLog.colours.push(colour);
+    setColour("");
+    await setHasColour(true);
+  }
 
   let speciesData = [{ value: "Gank" }, { value: "Cros" }, { value: "Idk" }];
 
@@ -73,21 +153,30 @@ const AddFossilScreen = (props) => {
             contentContainerStyle={styles.contentContainer}
           >
             <View style={styles.camera}>
-              <TouchableOpacity style={styles.imageBackground}>
+              <TouchableOpacity style={styles.imageBackground} onPress={takeImage}>
                 <Image style={styles.imageLogosTop} source={CameraLogo} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.photo}>
-              <TouchableOpacity style={styles.imageBackground}>
+              <TouchableOpacity style={styles.imageBackground} onPress={pickImage}>
                 <Image style={styles.imageLogosTop} source={PhotoLogo} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.document}>
-              <TouchableOpacity style={styles.imageBackground}>
+              <TouchableOpacity style={styles.imageBackground} onPress={pickedDocument}>
                 <Image style={styles.imageLogosTop} source={DocumentLogo} />
               </TouchableOpacity>
+            </View>
+
+            <View style={styles.selection}>
+              {hasFile &&
+                <TouchableOpacity style={styles.buttonLabel}>
+                  <Text style={styles.buttonText}>View Images</Text>
+                </TouchableOpacity>
+
+              }
             </View>
 
             <View style={styles.selection}>
@@ -122,7 +211,7 @@ const AddFossilScreen = (props) => {
             </View>
 
             <View style={styles.selection}>
-              <Text style={styles.label}>Country</Text>
+              <Text style={styles.countryLabel}>Country</Text>
               <TextInput
                 style={styles.selectionText}
                 placeholder="country name"
@@ -130,7 +219,7 @@ const AddFossilScreen = (props) => {
             </View>
 
             <View style={styles.selection}>
-              <Text style={styles.label}>Region</Text>
+              <Text style={styles.regionLabel}>Region</Text>
               <TextInput
                 style={styles.selectionText}
                 placeholder="region name"
@@ -138,33 +227,53 @@ const AddFossilScreen = (props) => {
             </View>
 
             <View style={styles.selection}>
-              <Text style={styles.label}>City</Text>
+              <Text style={styles.cityLabel}>City</Text>
               <TextInput
                 style={styles.selectionText}
                 placeholder="city name"
               ></TextInput>
             </View>
 
-            <Text>Time Period Range</Text>
-            <TextInput
-              placeholder="bottom range"
-              keyboardType="numeric"
-            ></TextInput>
-            <TextInput
-              placeholder="top range"
-              keyboardType="numeric"
-            ></TextInput>
+            <View style={styles.selection}><Text style={styles.timeLabel}>Time Period Range</Text></View>
+            <View style={styles.lowerSelection}>
+              <TextInput
+                placeholder="0"
+                keyboardType="numeric"
+              ></TextInput>
+            </View>
+            <Text style={styles.dashText}>-</Text>
+            <View style={styles.upperSelection}>
+              <TextInput
+                placeholder="0"
+                keyboardType="numeric"
+              ></TextInput>
+            </View>
 
             <View style={styles.selection}>
-              <Text style={styles.label}>Weight</Text>
+              <Text style={styles.weightLabel}>Weight</Text>
               <TextInput style={styles.selectionText} placeholder="0.0" keyboardType="numeric"></TextInput>
             </View>
 
-            <Text>Colour(s)</Text>
-            <TextInput placeholder="colour name"></TextInput>
+            <View style={styles.selection}>
+              <Text style={styles.colourLabel}>Colour(s)</Text>
+              <TextInput style={styles.selectionText} placeholder="colour name" onChangeText={e => handleColour(e)} />
+              <TouchableOpacity onPress={addColour} style={styles.plusIcon}><Text style={styles.plusIconText}>+</Text></TouchableOpacity>
+            </View>
 
-            <Text>+</Text>
+            {hasColour &&
+              newLog.colours.map((item, index) => {
+                return (<TouchableOpacity><Text>{item}</Text></TouchableOpacity>);
+              })
+            }
+
           </ScrollView>
+
+          <View style={styles.add}>
+            <TouchableOpacity>
+              <Text style={styles.plus}>+</Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.back}>
             <TouchableOpacity
               onPress={() => {

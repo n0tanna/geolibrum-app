@@ -117,13 +117,6 @@ const AddFossilScreen = (props) => {
     hideDatePicker();
   };
 
-  const Item = ({ title }) => (
-    <View>
-      <Text>{title}</Text>
-    </View>
-  );
-
-  const renderColour = ({ item }) => <Item title={item} />;
 
   const handleColour = (e) => {
     setColour(e);
@@ -133,6 +126,15 @@ const AddFossilScreen = (props) => {
     newLog.colours.push(colour);
     setColour("");
     await setHasColour(true);
+  }
+
+  const deleteColours = async (index) => {
+    console.log("ok");
+    newLog.colours.splice(index, 1);
+    if(newLog.colours.length === 0)
+    {
+      await setHasColour(false);
+    }
   }
 
   let speciesData = [{ value: "Gank" }, { value: "Cros" }, { value: "Idk" }];
@@ -262,7 +264,14 @@ const AddFossilScreen = (props) => {
 
             {hasColour &&
               newLog.colours.map((item, index) => {
-                return (<TouchableOpacity><Text>{item}</Text></TouchableOpacity>);
+                return (
+                  <View style={styles.displayColour}>
+                    <Text style={styles.textColour}>{item}</Text>
+                    <TouchableOpacity onPress={deleteColours(index)} style={styles.deleteColour}>
+                      <Text style={styles.deleteText}>x</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
               })
             }
 

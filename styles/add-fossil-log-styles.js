@@ -320,6 +320,32 @@ export default styles = StyleSheet.create({
     marginBottom: -0.5,
     marginRight: -0.8,
   },
+  displayColour: {
+    borderColor: "#223843",
+    borderWidth: 2,
+    borderRadius: 10,
+    marginTop: 5, 
+    backgroundColor: "#223843"
+  },
+  textColour: {
+    marginTop: 6,
+    marginBottom: -7,
+    marginLeft: 10,
+    fontSize: 15,
+    fontFamily: "NotoSans",
+    color: "#EFF1F3",
+  },
+  deleteColour: {
+    marginLeft: 150,
+    marginTop: -20,
+    paddingRight: 8,
+    marginBottom: 5
+  },
+  deleteText: {
+    fontSize: 20,
+    fontFamily: "NotoSans",
+    color: "#EFF1F3",
+  },
   back: {
     height: 60,
     width: 60,

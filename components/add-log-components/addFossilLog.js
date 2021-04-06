@@ -4,11 +4,11 @@ import {
   Image,
   Picker,
   TextInput,
-  SafeAreaView,
-  FlatList,
   ScrollView,
+  ListView,
   Text,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
 import CalendarLogo from "../../assets/Photos/Illustrated/calendar-logo.png";
@@ -19,7 +19,7 @@ import Back from "../../assets/Photos/Illustrated/back-logo.png";
 
 import styles from "../../styles/add-fossil-log-styles.js";
 import TypeWriter from "react-native-typewriter";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
 import { render } from "react-dom";
@@ -27,9 +27,16 @@ import { render } from "react-dom";
 const AddFossilScreen = (props) => {
   const { navigation } = props;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [colourList, setColourList] = useState([]);
+  const [imagesList, setImageList] = useState([]);
+  const [certList, setCertList] = useState([]);
+  const [hasFile, setHasFile] = useState(false);
+  const [colour, setColour] = useState("");
+  const [imagesModalVisible, setImagesModalVisible] = useState(false);
+
   const [newLog, setNewLog] = useState({
     type: 1,
-    species: "",
+    type: "",
     date: "",
     city: "",
     region: "",
@@ -42,21 +49,29 @@ const AddFossilScreen = (props) => {
     colours: [],
   });
 
-  const [image, setImage] = useState(null);
-  const [hasFile, setHasFile] = useState(false);
-  const [hasColour, setHasColour] = useState(false);
-  const [colour, setColour] = useState("");
-
   useEffect(() => {
     (async () => {
-      if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          alert('Sorry, we need camera roll permissions to make this work!');
+      if (Platform.OS !== "web") {
+        const {
+          status,
+        } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
         }
       }
     })();
   }, []);
+
+  const gatherData = () => {
+    newLog.colours = colourList;
+    newLog.images = imagesList;
+    newLog.certificate = certList;
+    console.log(newLog);
+  };
+
+  const handleImageModal = () => {
+    setImagesModalVisible(!imagesModalVisible);
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -67,7 +82,7 @@ const AddFossilScreen = (props) => {
     });
 
     if (!result.cancelled) {
-      setImage(result.uri);
+      setImageList([...imagesList, { uri: result.uri }]);
       await setHasFile(true);
     }
   };
@@ -81,7 +96,7 @@ const AddFossilScreen = (props) => {
     });
 
     if (!result.cancelled) {
-      setImage(result.uri);
+      setImageList([...imagesList, { uri: result.uri }]);
       await setHasFile(true);
     }
   };
@@ -95,7 +110,7 @@ const AddFossilScreen = (props) => {
     });
 
     if (!result.cancelled) {
-      setImage(result.uri);
+      setCertList([...certList, { uri: result.uri }]);
       await setHasFile(true);
     }
   };
@@ -117,25 +132,60 @@ const AddFossilScreen = (props) => {
     hideDatePicker();
   };
 
+  const handleSpecies = (e) => {
+    newLog.type = e;
+  };
 
   const handleColour = (e) => {
     setColour(e);
-  }
+  };
 
-  const addColour = async () => {
-    newLog.colours.push(colour);
-    setColour("");
-    await setHasColour(true);
-  }
+  const handleCountry = (e) => {
+    newLog.country = e;
+  };
 
-  const deleteColours = async (index) => {
-    console.log("ok");
-    newLog.colours.splice(index, 1);
-    if(newLog.colours.length === 0)
-    {
-      await setHasColour(false);
+  const handleRegion = (e) => {
+    newLog.region = e;
+  };
+
+  const handleCity = (e) => {
+    newLog.city = e;
+  };
+
+  const handleTimeLower = (e) => {
+    newLog.lowerTime = e;
+  };
+
+  const handleTimeUpper = (e) => {
+    newLog.upperTime = e;
+  };
+
+  const handleWeight = (e) => {
+    newLog.weight = e;
+  };
+
+  const addColourToList = () => {
+    setColourList([...colourList, colour]);
+    setColour();
+  };
+
+  const deleteColours = (holder) => {
+    setColourList(colourList.filter((item) => item !== holder));
+  };
+
+  const deleteImage = async (holder) => {
+    setImageList(imagesList.filter((item) => item !== holder));
+    if (certList.length === 0 && imagesList.length === 1) {
+      await setHasFile(false);
     }
-  }
+  };
+
+  const deleteCert = async (holder) => {
+    setCertList(certList.filter((item) => item !== holder));
+    if (certList.length === 1 && imagesList.length === 0) {
+      await setHasFile(false);
+    }
+  };
 
   let speciesData = [{ value: "Gank" }, { value: "Cros" }, { value: "Idk" }];
 
@@ -147,6 +197,16 @@ const AddFossilScreen = (props) => {
           Geolibrum
         </TypeWriter>
       </View>
+
+      <ImageModal
+        imagesList={imagesList}
+        certList={certList}
+        handleImageModal={handleImageModal}
+        showImageModal={imagesModalVisible}
+        deleteImage={deleteImage}
+        deleteCert={deleteCert}
+      />
+
       <View style={styles.body}>
         <View style={styles.holder}>
           <Text style={styles.areaTitle}>Add Fossil</Text>
@@ -155,38 +215,59 @@ const AddFossilScreen = (props) => {
             contentContainerStyle={styles.contentContainer}
           >
             <View style={styles.camera}>
-              <TouchableOpacity style={styles.imageBackground} onPress={takeImage}>
+              <TouchableOpacity
+                style={styles.imageBackground}
+                onPress={takeImage}
+              >
                 <Image style={styles.imageLogosTop} source={CameraLogo} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.photo}>
-              <TouchableOpacity style={styles.imageBackground} onPress={pickImage}>
+              <TouchableOpacity
+                style={styles.imageBackground}
+                onPress={pickImage}
+              >
                 <Image style={styles.imageLogosTop} source={PhotoLogo} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.document}>
-              <TouchableOpacity style={styles.imageBackground} onPress={pickedDocument}>
+              <TouchableOpacity
+                style={styles.imageBackground}
+                onPress={pickedDocument}
+              >
                 <Image style={styles.imageLogosTop} source={DocumentLogo} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.selection}>
-              {hasFile &&
-                <TouchableOpacity style={styles.buttonLabel}>
+              {hasFile && (
+                <TouchableOpacity
+                  onPress={handleImageModal}
+                  style={styles.buttonLabel}
+                >
                   <Text style={styles.buttonText}>View Images</Text>
                 </TouchableOpacity>
-
-              }
+              )}
             </View>
 
             <View style={styles.selection}>
               <Text style={styles.speciesLabel}>Species</Text>
               <View style={styles.speciesPicker}>
-                <Picker style={styles.dropDown}>
+                <Picker
+                  selectedValue={newLog.type}
+                  onValueChange={(value) => handleSpecies(value)}
+                  style={styles.dropDown}
+                >
                   {speciesData.map((data) => {
-                    return <Picker.Item label={data.value} />;
+                    return (
+                      <Picker.Item
+                        label={data.value}
+                        value={data.value}
+                        key={data.value}
+                      />
+                    );
                   })}
                 </Picker>
               </View>
@@ -217,6 +298,7 @@ const AddFossilScreen = (props) => {
               <TextInput
                 style={styles.selectionText}
                 placeholder="country name"
+                onChangeText={(e) => handleCountry(e)}
               ></TextInput>
             </View>
 
@@ -225,6 +307,7 @@ const AddFossilScreen = (props) => {
               <TextInput
                 style={styles.selectionText}
                 placeholder="region name"
+                onChangeText={(e) => handleRegion(e)}
               ></TextInput>
             </View>
 
@@ -233,12 +316,16 @@ const AddFossilScreen = (props) => {
               <TextInput
                 style={styles.selectionText}
                 placeholder="city name"
+                onChangeText={(e) => handleCity(e)}
               ></TextInput>
             </View>
 
-            <View style={styles.selection}><Text style={styles.timeLabel}>Time Period Range</Text></View>
+            <View style={styles.selection}>
+              <Text style={styles.timeLabel}>Time Period Range</Text>
+            </View>
             <View style={styles.lowerSelection}>
               <TextInput
+                onChangeText={(e) => handleTimeLower(e)}
                 placeholder="0"
                 keyboardType="numeric"
               ></TextInput>
@@ -246,6 +333,7 @@ const AddFossilScreen = (props) => {
             <Text style={styles.dashText}>-</Text>
             <View style={styles.upperSelection}>
               <TextInput
+                onChangeText={(e) => handleTimeUpper(e)}
                 placeholder="0"
                 keyboardType="numeric"
               ></TextInput>
@@ -253,32 +341,44 @@ const AddFossilScreen = (props) => {
 
             <View style={styles.selection}>
               <Text style={styles.weightLabel}>Weight</Text>
-              <TextInput style={styles.selectionText} placeholder="0.0" keyboardType="numeric"></TextInput>
+              <TextInput
+                style={styles.selectionText}
+                placeholder="0.0"
+                keyboardType="numeric"
+                onChangeText={(e) => handleWeight(e)}
+              ></TextInput>
             </View>
 
             <View style={styles.selection}>
               <Text style={styles.colourLabel}>Colour(s)</Text>
-              <TextInput style={styles.selectionText} placeholder="colour name" onChangeText={e => handleColour(e)} />
-              <TouchableOpacity onPress={addColour} style={styles.plusIcon}><Text style={styles.plusIconText}>+</Text></TouchableOpacity>
+              <TextInput
+                style={styles.selectionText}
+                placeholder="colour name"
+                onChangeText={(e) => handleColour(e)}
+              />
+              <TouchableOpacity
+                onPress={addColourToList}
+                style={styles.plusIcon}
+              >
+                <Text style={styles.plusIconText}>+</Text>
+              </TouchableOpacity>
             </View>
 
-            {hasColour &&
-              newLog.colours.map((item, index) => {
-                return (
-                  <View style={styles.displayColour}>
-                    <Text style={styles.textColour}>{item}</Text>
-                    <TouchableOpacity onPress={deleteColours(index)} style={styles.deleteColour}>
-                      <Text style={styles.deleteText}>x</Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              })
-            }
-
+            {colourList.map((item, index) => (
+              <View style={styles.displayColour}>
+                <Text style={styles.textColour}>{item}</Text>
+                <TouchableOpacity
+                  onPress={() => deleteColours(item)}
+                  style={styles.deleteColour}
+                >
+                  <Text style={styles.deleteText}>x</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
           </ScrollView>
 
           <View style={styles.add}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={gatherData}>
               <Text style={styles.plus}>+</Text>
             </TouchableOpacity>
           </View>
@@ -295,6 +395,77 @@ const AddFossilScreen = (props) => {
         </View>
       </View>
     </View>
+  );
+};
+
+const ImageModal = (props) => {
+  const {
+    imagesList,
+    certList,
+    handleImageModal,
+    showImageModal,
+    deleteImage,
+    deleteCert,
+  } = props;
+
+  return (
+    <Modal
+      animationType={"slide"}
+      transparent={true}
+      visible={showImageModal}
+      onRequestClose={() => {
+        handleImageModal();
+      }}
+    >
+      <View style={styles.imageModal}>
+        <ScrollView>
+          {imagesList.length > 0 && (
+            <View>
+              <Text>Images</Text>
+            </View>
+          )}
+          {imagesList.length > 0 &&
+            imagesList.map((image) => {
+              return (
+                <View contentContainerStyle={styles.modalScrollView}>
+                  <TouchableOpacity onPress={() => deleteImage(image)}>
+                    <Image
+                      style={styles.modalImage}
+                      source={{ uri: image.uri }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          {certList.length > 0 && (
+            <View>
+              <Text>Certificates</Text>
+            </View>
+          )}
+          {certList.length > 0 &&
+            certList.map((image) => {
+              return (
+                <View>
+                  <TouchableOpacity onPress={() => deleteCert(image)}>
+                    <Image
+                      style={styles.modalImage}
+                      source={{ uri: image.uri }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+        </ScrollView>
+        <View>
+          <TouchableOpacity
+            style={styles.buttonLabel}
+            onPress={handleImageModal}
+          >
+            <Text style={styles.buttonText}>Return</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
   );
 };
 

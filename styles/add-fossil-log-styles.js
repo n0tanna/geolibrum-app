@@ -374,4 +374,15 @@ export default styles = StyleSheet.create({
     fontSize: 50,
     marginTop: -5
   },
+  imageModal: {
+    flex: 1,
+    backgroundColor: "#EFF1F3",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalImage: {
+    marginTop: 10,
+    height: 370,
+    width: 370,
+  },
 });

@@ -384,5 +384,36 @@ export default styles = StyleSheet.create({
     marginTop: 10,
     height: 370,
     width: 370,
+    borderRadius: 5,
   },
+  modalButtonText: {
+    fontFamily: "NotoSans",
+    color: "#EFF1F3",
+    fontSize: 16,
+  },
+  modalButtonLabel: {
+    paddingTop: 14,
+    paddingBottom: 14,
+    paddingRight: 96,
+    paddingLeft: 96,
+    backgroundColor: "#223843",
+    fontSize: 15,
+    color: "#EFF1F3",
+    borderRadius: 10,
+    marginTop: 10,
+    marginLeft: -0.5,
+    alignItems: "center",
+    marginBottom: 10,
+    marginRight: -0.8,
+  },
+  modalTitle: {
+    fontSize: 40,
+    fontFamily: "Philosopher",
+    color: "#223843",
+  },
+  modalTitleArea: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: -10
+  }
 });

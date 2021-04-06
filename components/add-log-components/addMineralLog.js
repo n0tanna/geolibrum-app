@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -7,7 +7,9 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
+  Modal,
 } from "react-native";
+
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
 import CalendarLogo from "../../assets/Photos/Illustrated/calendar-logo.png";
 import CameraLogo from "../../assets/Photos/Illustrated/camera-logo.png";
@@ -15,26 +17,100 @@ import DocumentLogo from "../../assets/Photos/Illustrated/document-logo.png";
 import PhotoLogo from "../../assets/Photos/Illustrated/photo-logo.png";
 import Back from "../../assets/Photos/Illustrated/back-logo.png";
 
-import styles from "../../styles/add-mineral-log-styles.js";
+import styles from "../../styles/add-fossil-log-styles.js";
 import TypeWriter from "react-native-typewriter";
+import * as ImagePicker from "expo-image-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
 
 const AddMineralScreen = (props) => {
   const { navigation } = props;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [colourList, setColourList] = useState([]);
+  const [imagesList, setImageList] = useState([]);
+  const [certList, setCertList] = useState([]);
+  const [hasFile, setHasFile] = useState(false);
+  const [colour, setColour] = useState("");
+  const [imagesModalVisible, setImagesModalVisible] = useState(false);
+
   const [newLog, setNewLog] = useState({
     type: 1,
-    species: "",
+    type: "",
     date: "",
     city: "",
     region: "",
     country: "",
-    upperTime: "",
-    lowerTime: "",
     weight: "",
+    images: [],
+    certificate: [],
     colours: [],
   });
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const {
+          status,
+        } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
+
+  const gatherData = () => {
+    newLog.colours = colourList;
+    newLog.images = imagesList;
+    newLog.certificate = certList;
+    console.log(newLog);
+  };
+
+  const handleImageModal = () => {
+    setImagesModalVisible(!imagesModalVisible);
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImageList([...imagesList, { uri: result.uri }]);
+      await setHasFile(true);
+    }
+  };
+
+  const takeImage = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImageList([...imagesList, { uri: result.uri }]);
+      await setHasFile(true);
+    }
+  };
+
+  const pickedDocument = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setCertList([...certList, { uri: result.uri }]);
+      await setHasFile(true);
+    }
+  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -53,7 +129,54 @@ const AddMineralScreen = (props) => {
     hideDatePicker();
   };
 
-  let speciesData = [{ value: "Gank" }, { value: "Cros" }, { value: "Idk" }];
+  const handleType = (e) => {
+    newLog.type = e;
+  };
+
+  const handleColour = (e) => {
+    setColour(e);
+  };
+
+  const handleCountry = (e) => {
+    newLog.country = e;
+  };
+
+  const handleRegion = (e) => {
+    newLog.region = e;
+  };
+
+  const handleCity = (e) => {
+    newLog.city = e;
+  };
+
+  const handleWeight = (e) => {
+    newLog.weight = e;
+  };
+
+  const addColourToList = () => {
+    setColourList([...colourList, colour]);
+    setColour();
+  };
+
+  const deleteColours = (holder) => {
+    setColourList(colourList.filter((item) => item !== holder));
+  };
+
+  const deleteImage = async (holder) => {
+    setImageList(imagesList.filter((item) => item !== holder));
+    if (certList.length === 0 && imagesList.length === 1) {
+      await setHasFile(false);
+    }
+  };
+
+  const deleteCert = async (holder) => {
+    setCertList(certList.filter((item) => item !== holder));
+    if (certList.length === 1 && imagesList.length === 0) {
+      await setHasFile(false);
+    }
+  };
+
+  let typeData = [{ value: "Gank" }, { value: "Cros" }, { value: "Idk" }];
 
   return (
     <View style={styles.header}>
@@ -63,37 +186,77 @@ const AddMineralScreen = (props) => {
           Geolibrum
         </TypeWriter>
       </View>
+
+      <ImageModal
+        imagesList={imagesList}
+        certList={certList}
+        handleImageModal={handleImageModal}
+        showImageModal={imagesModalVisible}
+        deleteImage={deleteImage}
+        deleteCert={deleteCert}
+      />
+
       <View style={styles.body}>
         <View style={styles.holder}>
-          <Text style={styles.areaTitle}>Add Mineral</Text>
+          <Text style={styles.areaTitle}>Add Fossil</Text>
           <ScrollView
             style={styles.container}
             contentContainerStyle={styles.contentContainer}
           >
             <View style={styles.camera}>
-              <TouchableOpacity style={styles.imageBackground}>
+              <TouchableOpacity
+                style={styles.imageBackground}
+                onPress={takeImage}
+              >
                 <Image style={styles.imageLogosTop} source={CameraLogo} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.photo}>
-              <TouchableOpacity style={styles.imageBackground}>
+              <TouchableOpacity
+                style={styles.imageBackground}
+                onPress={pickImage}
+              >
                 <Image style={styles.imageLogosTop} source={PhotoLogo} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.document}>
-              <TouchableOpacity style={styles.imageBackground}>
+              <TouchableOpacity
+                style={styles.imageBackground}
+                onPress={pickedDocument}
+              >
                 <Image style={styles.imageLogosTop} source={DocumentLogo} />
               </TouchableOpacity>
             </View>
 
             <View style={styles.selection}>
+              {hasFile && (
+                <TouchableOpacity
+                  onPress={handleImageModal}
+                  style={styles.buttonLabel}
+                >
+                  <Text style={styles.buttonText}>View Images</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <View style={styles.selection}>
               <Text style={styles.typeLabel}>Type</Text>
               <View style={styles.typePicker}>
-                <Picker style={styles.dropDown}>
-                  {speciesData.map((data) => {
-                    return <Picker.Item label={data.value} />;
+                <Picker
+                  selectedValue={newLog.type}
+                  onValueChange={(value) => handleType(value)}
+                  style={styles.dropDown}
+                >
+                  {typeData.map((data) => {
+                    return (
+                      <Picker.Item
+                        label={data.value}
+                        value={data.value}
+                        key={data.value}
+                      />
+                    );
                   })}
                 </Picker>
               </View>
@@ -124,6 +287,7 @@ const AddMineralScreen = (props) => {
               <TextInput
                 style={styles.selectionText}
                 placeholder="country name"
+                onChangeText={(e) => handleCountry(e)}
               ></TextInput>
             </View>
 
@@ -132,6 +296,7 @@ const AddMineralScreen = (props) => {
               <TextInput
                 style={styles.selectionText}
                 placeholder="region name"
+                onChangeText={(e) => handleRegion(e)}
               ></TextInput>
             </View>
 
@@ -140,23 +305,51 @@ const AddMineralScreen = (props) => {
               <TextInput
                 style={styles.selectionText}
                 placeholder="city name"
+                onChangeText={(e) => handleCity(e)}
+              ></TextInput>
+            </View>
+
+
+            <View style={styles.selection}>
+              <Text style={styles.weightLabel}>Weight</Text>
+              <TextInput
+                style={styles.selectionText}
+                placeholder="0.0"
+                keyboardType="numeric"
+                onChangeText={(e) => handleWeight(e)}
               ></TextInput>
             </View>
 
             <View style={styles.selection}>
-              <Text style={styles.weightLabel}>Weight</Text>
-              <TextInput style={styles.selectionText} placeholder="0.0" keyboardType="numeric"></TextInput>
+              <Text style={styles.colourLabel}>Colour(s)</Text>
+              <TextInput
+                style={styles.selectionText}
+                placeholder="colour name"
+                onChangeText={(e) => handleColour(e)}
+              />
+              <TouchableOpacity
+                onPress={addColourToList}
+                style={styles.plusIcon}
+              >
+                <Text style={styles.plusIconText}>+</Text>
+              </TouchableOpacity>
             </View>
 
-            <View style={styles.selection}>
-              <Text style={styles.colourLabel}>Colour(s)</Text>
-              <TextInput style={styles.selectionText} placeholder="colour name"></TextInput>
-              <TouchableOpacity style={styles.plusIcon}><Text style={styles.plusIconText}>+</Text></TouchableOpacity>
-            </View>
+            {colourList.map((item, index) => (
+              <View style={styles.displayColour}>
+                <Text style={styles.textColour}>{item}</Text>
+                <TouchableOpacity
+                  onPress={() => deleteColours(item)}
+                  style={styles.deleteColour}
+                >
+                  <Text style={styles.deleteText}>x</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
           </ScrollView>
-          
+
           <View style={styles.add}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={gatherData}>
               <Text style={styles.plus}>+</Text>
             </TouchableOpacity>
           </View>
@@ -173,6 +366,77 @@ const AddMineralScreen = (props) => {
         </View>
       </View>
     </View>
+  );
+};
+
+const ImageModal = (props) => {
+  const {
+    imagesList,
+    certList,
+    handleImageModal,
+    showImageModal,
+    deleteImage,
+    deleteCert,
+  } = props;
+
+  return (
+    <Modal
+      animationType={"slide"}
+      transparent={true}
+      visible={showImageModal}
+      onRequestClose={() => {
+        handleImageModal();
+      }}
+    >
+      <View style={styles.imageModal}>
+        <ScrollView>
+          {imagesList.length > 0 && (
+            <View style={styles.modalTitleArea}>
+              <Text style={styles.modalTitle}>Images</Text>
+            </View>
+          )}
+          {imagesList.length > 0 &&
+            imagesList.map((image) => {
+              return (
+                <View contentContainerStyle={styles.modalScrollView}>
+                  <TouchableOpacity onPress={() => deleteImage(image)}>
+                    <Image
+                      style={styles.modalImage}
+                      source={{ uri: image.uri }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          {certList.length > 0 && (
+            <View style={styles.modalTitleArea}>
+              <Text style={styles.modalTitle}>Certificates</Text>
+            </View>
+          )}
+          {certList.length > 0 &&
+            certList.map((image) => {
+              return (
+                <View>
+                  <TouchableOpacity onPress={() => deleteCert(image)}>
+                    <Image
+                      style={styles.modalImage}
+                      source={{ uri: image.uri }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          <View>
+            <TouchableOpacity
+              style={styles.modalButtonLabel}
+              onPress={handleImageModal}
+            >
+              <Text style={styles.modalButtonText}>Return</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    </Modal>
   );
 };
 

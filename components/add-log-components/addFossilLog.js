@@ -5,11 +5,11 @@ import {
   Picker,
   TextInput,
   ScrollView,
-  ListView,
   Text,
   TouchableOpacity,
   Modal,
 } from "react-native";
+
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
 import CalendarLogo from "../../assets/Photos/Illustrated/calendar-logo.png";
 import CameraLogo from "../../assets/Photos/Illustrated/camera-logo.png";
@@ -22,7 +22,6 @@ import TypeWriter from "react-native-typewriter";
 import * as ImagePicker from "expo-image-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
-import { render } from "react-dom";
 
 const AddFossilScreen = (props) => {
   const { navigation } = props;
@@ -420,8 +419,8 @@ const ImageModal = (props) => {
       <View style={styles.imageModal}>
         <ScrollView>
           {imagesList.length > 0 && (
-            <View>
-              <Text>Images</Text>
+            <View style={styles.modalTitleArea}>
+              <Text style={styles.modalTitle}>Images</Text>
             </View>
           )}
           {imagesList.length > 0 &&
@@ -438,8 +437,8 @@ const ImageModal = (props) => {
               );
             })}
           {certList.length > 0 && (
-            <View>
-              <Text>Certificates</Text>
+            <View style={styles.modalTitleArea}>
+              <Text style={styles.modalTitle}>Certificates</Text>
             </View>
           )}
           {certList.length > 0 &&
@@ -455,15 +454,15 @@ const ImageModal = (props) => {
                 </View>
               );
             })}
+          <View>
+            <TouchableOpacity
+              style={styles.modalButtonLabel}
+              onPress={handleImageModal}
+            >
+              <Text style={styles.modalButtonText}>Return</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
-        <View>
-          <TouchableOpacity
-            style={styles.buttonLabel}
-            onPress={handleImageModal}
-          >
-            <Text style={styles.buttonText}>Return</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </Modal>
   );

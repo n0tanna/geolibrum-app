@@ -1,14 +1,20 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+
 import HomeScreen from "./components/home";
 import LogScreen from "./components/logs";
+
 import ChooseTypeScreen from "./components/add-log-components/chooseType";
 import AddRockScreen from "./components/add-log-components/addRockLog";
 import AddFossilScreen from "./components/add-log-components/addFossilLog";
 import AddMineralScreen from "./components/add-log-components/addMineralLog";
+
+import LoginScreen from "./components/sign-in-components/loginAccount";
+import RegisterScreen from "./components/sign-in-components/registerAccount";
+
 import { useFonts } from "@use-expo/font";
+
 import AppLoading from "expo-app-loading";
 
 const customFonts = {
@@ -71,6 +77,24 @@ const App = () => {
           name="AddFossil"
           children={(props) => (
             <AddFossilScreen
+              {...props}
+            />
+          )}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Login"
+          children={(props) => (
+            <LoginScreen
+              {...props}
+            />
+          )}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          children={(props) => (
+            <RegisterScreen
               {...props}
             />
           )}

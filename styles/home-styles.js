@@ -32,7 +32,9 @@ export default styles = StyleSheet.create({
     paddingRight: 70,
     paddingTop: 10,
     paddingBottom: 10,
+    marginBottom: 5,
     borderRadius: 5,
+    alignItems: "center"
   },
   buttonText: {
     color: "#EFF1F3",
@@ -46,7 +48,7 @@ export default styles = StyleSheet.create({
     paddingTop: 20,
     paddingLeft: 15,
     paddingRight: 15,
-    marginBottom: 180,
+    marginBottom: 100,
     alignItems: "center",
     borderRadius: 10,
   },

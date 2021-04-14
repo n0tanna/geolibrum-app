@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -22,7 +22,12 @@ const customFonts = {
   NotoSans: require("./assets/fonts/NotoSans/NotoSans-Regular.ttf")
 };
 
+const isLoggedIn = (state) => {
+  setLoggedIn(state);
+}
+
 const App = () => {
+  [loggedIn, setLoggedIn] = useState(false);
   const Stack = createStackNavigator();
   const [isLoaded] = useFonts(customFonts);
 
@@ -34,8 +39,14 @@ const App = () => {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Home"
-          component={HomeScreen}
+          children={(props) => (
+            <HomeScreen
+              {...props}
+              loggedIn={loggedIn}
+            />
+          )}
           options={{ headerShown: false }}
+
         />
         <Stack.Screen
           name="Logs"
@@ -87,6 +98,7 @@ const App = () => {
           children={(props) => (
             <LoginScreen
               {...props}
+              isLoggedIn={isLoggedIn}
             />
           )}
           options={{ headerShown: false }}

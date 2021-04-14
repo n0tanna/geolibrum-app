@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Modal,
+  Alert
 } from "react-native";
 
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
@@ -16,6 +17,8 @@ import CameraLogo from "../../assets/Photos/Illustrated/camera-logo.png";
 import DocumentLogo from "../../assets/Photos/Illustrated/document-logo.png";
 import PhotoLogo from "../../assets/Photos/Illustrated/photo-logo.png";
 import Back from "../../assets/Photos/Illustrated/back-logo.png";
+
+import { db, firestore, auth } from "../../database/databaseConfig";
 
 import styles from "../../styles/add-fossil-log-styles.js";
 import TypeWriter from "react-native-typewriter";
@@ -34,7 +37,7 @@ const AddFossilScreen = (props) => {
   const [imagesModalVisible, setImagesModalVisible] = useState(false);
 
   const [newLog, setNewLog] = useState({
-    type: 1,
+    category: 1,
     type: "",
     date: "",
     city: "",
@@ -61,11 +64,35 @@ const AddFossilScreen = (props) => {
     })();
   }, []);
 
+
   const gatherData = () => {
     newLog.colours = colourList;
     newLog.images = imagesList;
     newLog.certificate = certList;
     console.log(newLog);
+
+    db.ref('logs/').set({
+        category: newLog.category,
+        type: newLog.type,
+        date: newLog.date,
+        city: newLog.city,
+        region: newLog.region,
+        country: newLog.country,
+        upperTime: newLog.upperTime,
+        lowerTime: newLog.lowerTime,
+        weight: newLog.weight,
+        images: newLog.images,
+        certificate: newLog.certificate,
+        colours: newLog.colours
+    });
+
+    Alert.alert(
+      "Success!",
+      "Your log has been added!",
+      [
+        { text: "OK", onPress: () => navigation.navigate("Home") }
+      ]
+    );
   };
 
   const handleImageModal = () => {

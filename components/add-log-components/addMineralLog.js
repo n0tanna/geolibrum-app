@@ -17,7 +17,7 @@ import DocumentLogo from "../../assets/Photos/Illustrated/document-logo.png";
 import PhotoLogo from "../../assets/Photos/Illustrated/photo-logo.png";
 import Back from "../../assets/Photos/Illustrated/back-logo.png";
 
-import styles from "../../styles/add-fossil-log-styles.js";
+import styles from "../../styles/add-mineral-log-styles.js";
 import TypeWriter from "react-native-typewriter";
 import * as ImagePicker from "expo-image-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";

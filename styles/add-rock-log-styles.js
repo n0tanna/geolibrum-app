@@ -285,7 +285,6 @@ export default styles = StyleSheet.create({
     fontSize: 50,
     marginTop: -5
   },
-  ,
   imageModal: {
     flex: 1,
     backgroundColor: "#EFF1F3",

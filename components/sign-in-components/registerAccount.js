@@ -1,4 +1,4 @@
-import { View, Image, TouchableOpacity, TextInput, Text, Button } from "react-native";
+import { View, Image, TouchableOpacity, TextInput, Text, Button, Alert } from "react-native";
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
 import styles from "../../styles/register-styles.js";
 import TypeWriter from "react-native-typewriter";
@@ -57,6 +57,7 @@ const RegisterScreen = (props) => {
               style={styles.textInput}
               autoCapitalize="none"
               autoCorrect={false}
+              onChangeText={ (value) => setRegistrationEmail(value) }
               autoCompleteType="email"
               keyboardType="email-address"
               placeholder="email"
@@ -67,9 +68,10 @@ const RegisterScreen = (props) => {
               autoCorrect={false}
               autoCompleteType="password"
               keyboardType="visible-password"
+              onChangeText={ (value) => setRegistrationPassword(value) }
               placeholder="password"
             />
-            <Button style={styles.button} title="Register" />
+            <Button style={styles.button} title="Register" onPress={() => {registerWithFirebase, navigation.navigate("ChooseType");}} />
         </View>
       </View>
     </View>

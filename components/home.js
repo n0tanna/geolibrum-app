@@ -13,7 +13,7 @@ import GeolibrumLogo from "../assets/Photos/Illustrated/geolibrum-logo.png";
 import { db, firestore, auth } from "../database/databaseConfig";
 
 const HomeScreen = (props) => {
-  const { navigation } = props;
+  const { navigation, loggedIn} = props;
 
   signoutWithFirebase = () => {
     auth.signOut().then(function () {

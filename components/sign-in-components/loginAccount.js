@@ -1,14 +1,15 @@
-import { View, Image, TouchableOpacity, TextInput, Text, Button } from "react-native";
+import { View, Image, TouchableOpacity, Alert, TextInput, Text, Button } from "react-native";
 import React, { useState, useEffect } from "react";
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
 import styles from "../../styles/login-styles.js";
 import TypeWriter from "react-native-typewriter";
+import { db, firestore, auth } from "../../database/databaseConfig";
 
 const LoginScreen = (props) => {
-  const { navigation } = props;
+  const { navigation, isLoggedIn} = props;
 
+  [loginEmail, setLoginEmail] = useState('');
   [loginPassword, setLoginPassword] = useState("");
-  [loggedIn, setLoggedIn] = useState(false);
   
   loginWithFirebase = () => {
     if (loginEmail.length < 4) {
@@ -55,6 +56,7 @@ const LoginScreen = (props) => {
         <Text style={styles.label}>Sign In with Firebase</Text>
             <TextInput
               style={styles.textInput}
+              onChangeText={ (value) => setLoginEmail(value) }
               autoCapitalize="none"
               autoCorrect={false}
               autoCompleteType="email"
@@ -63,13 +65,14 @@ const LoginScreen = (props) => {
             />
             <TextInput
               style={styles.textInput}
+              onChangeText={ (value) => setLoginPassword(value) }
               autoCapitalize="none"
               autoCorrect={false}
               autoCompleteType="password"
               keyboardType="visible-password"
               placeholder="password"
             />
-            <Button style={styles.button} title="Login" />
+            <Button style={styles.button} title="Login" onPress={loginWithFirebase} />
         </View>
       </View>
     </View>

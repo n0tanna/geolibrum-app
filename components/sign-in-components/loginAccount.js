@@ -1,4 +1,12 @@
-import { View, Image, TouchableOpacity, Alert, TextInput, Text, Button } from "react-native";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+  Text,
+  Button,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
 import styles from "../../styles/login-styles.js";
@@ -6,12 +14,12 @@ import TypeWriter from "react-native-typewriter";
 import { db, firestore, auth } from "../../database/databaseConfig";
 
 const LoginScreen = (props) => {
-  const { navigation, isLoggedIn} = props;
+  const { navigation, isLoggedIn } = props;
 
-  [loginEmail, setLoginEmail] = useState('');
+  [loginEmail, setLoginEmail] = useState("");
   [loginPassword, setLoginPassword] = useState("");
-  
-  loginWithFirebase = () => {
+
+  loginWithFirebase = async () => {
     if (loginEmail.length < 4) {
       Alert.alert("Please enter an email address.");
       return;
@@ -53,26 +61,34 @@ const LoginScreen = (props) => {
       </View>
       <View style={styles.body}>
         <View style={styles.holder}>
-        <Text style={styles.label}>Sign In with Firebase</Text>
-            <TextInput
-              style={styles.textInput}
-              onChangeText={ (value) => setLoginEmail(value) }
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoCompleteType="email"
-              keyboardType="email-address"
-              placeholder="email"
-            />
-            <TextInput
-              style={styles.textInput}
-              onChangeText={ (value) => setLoginPassword(value) }
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoCompleteType="password"
-              keyboardType="visible-password"
-              placeholder="password"
-            />
-            <Button style={styles.button} title="Login" onPress={loginWithFirebase} />
+          <Text style={styles.areaTitle}>Sign In</Text>
+          <TextInput
+            style={styles.selection}
+            onChangeText={(value) => setLoginEmail(value)}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoCompleteType="email"
+            keyboardType="email-address"
+            placeholder="email"
+          />
+          <TextInput
+            style={styles.selection}
+            onChangeText={(value) => setLoginPassword(value)}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoCompleteType="password"
+            keyboardType="visible-password"
+            placeholder="password"
+          />
+          <TouchableOpacity
+            style={styles.buttonLabel}
+            onPress={() => {
+              navigation.navigate("Home");
+              loginWithFirebase();
+            }}
+          >
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

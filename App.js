@@ -9,6 +9,7 @@ import ChooseTypeScreen from "./components/add-log-components/chooseType";
 import AddRockScreen from "./components/add-log-components/addRockLog";
 import AddFossilScreen from "./components/add-log-components/addFossilLog";
 import AddMineralScreen from "./components/add-log-components/addMineralLog";
+import ViewLog from "./components/view-log-components/viewLog";
 
 import LoginScreen from "./components/sign-in-components/loginAccount";
 import RegisterScreen from "./components/sign-in-components/registerAccount";
@@ -26,8 +27,13 @@ const isLoggedIn = (state) => {
   setLoggedIn(state);
 }
 
+const setCurrentLog = (log) => {
+  setLog(log);
+}
+
 const App = () => {
   [loggedIn, setLoggedIn] = useState(false);
+  [log, setLog] = useState();
   const Stack = createStackNavigator();
   const [isLoaded] = useFonts(customFonts);
 
@@ -53,6 +59,7 @@ const App = () => {
           children={(props) => (
             <LogScreen
               {...props}
+              setLog={setCurrentLog}
             />
           )}
           options={{ headerShown: false }}
@@ -108,6 +115,16 @@ const App = () => {
           children={(props) => (
             <RegisterScreen
               {...props}
+            />
+          )}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="View"
+          children={(props) => (
+            <ViewLog
+              {...props}
+              currentLog={log}
             />
           )}
           options={{ headerShown: false }}

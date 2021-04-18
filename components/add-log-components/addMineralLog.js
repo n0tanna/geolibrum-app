@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Modal,
+  Alert
 } from "react-native";
 
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
@@ -23,6 +24,9 @@ import * as ImagePicker from "expo-image-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
 
+import { db, firestore, auth } from "../../database/databaseConfig";
+
+
 const AddMineralScreen = (props) => {
   const { navigation } = props;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -33,14 +37,35 @@ const AddMineralScreen = (props) => {
   const [colour, setColour] = useState("");
   const [imagesModalVisible, setImagesModalVisible] = useState(false);
 
+  useEffect(() => { loadDatabase();});
+  let count = 0;
+
+  const loadDatabase = async () => {
+    await db.ref("logs/").on("value", (snapshot) => {
+      var tasks = [];  
+      snapshot.forEach((child) => {
+        count++;
+      });
+
+      tasks.forEach((holder) => {
+        listHolder.push(holder);
+      });
+    });
+    newLog.id = count;
+  };
+
   const [newLog, setNewLog] = useState({
-    type: 1,
+    id: count,
+    category: 0,
     type: "",
     date: "",
     city: "",
     region: "",
     country: "",
+    upperTime: "",
+    lowerTime: "",
     weight: "",
+    qrlink: "",
     images: [],
     certificate: [],
     colours: [],
@@ -63,7 +88,30 @@ const AddMineralScreen = (props) => {
     newLog.colours = colourList;
     newLog.images = imagesList;
     newLog.certificate = certList;
-    console.log(newLog);
+    newLog.qrlink = `https://geolibrum.rocks/${newLog.category}/${newLog.type}/${newLog.id}`
+
+    db.ref("logs/").push(
+      {
+        id: newLog.id,
+        category: newLog.category,
+        type: newLog.type,
+        date: newLog.date,
+        city: newLog.city,
+        region: newLog.region,
+        country: newLog.country,
+        upperTime: newLog.upperTime,
+        lowerTime: newLog.lowerTime,
+        weight: newLog.weight,
+        images: newLog.images,
+        qrlink: newLog.qrlink,
+        certificate: newLog.certificate,
+        colours: newLog.colours,
+      }
+    );
+
+    Alert.alert("Success!", "Your log has been added!", [
+      { text: "OK", onPress: () => navigation.navigate("Home") },
+    ]);
   };
 
   const handleImageModal = () => {
@@ -176,7 +224,7 @@ const AddMineralScreen = (props) => {
     }
   };
 
-  let typeData = [{ value: "Gank" }, { value: "Cros" }, { value: "Idk" }];
+  let speciesData = [{ value: "Gank" }, { value: "Cros" }, { value: "Idk" }];
 
   return (
     <View style={styles.header}>
@@ -198,7 +246,7 @@ const AddMineralScreen = (props) => {
 
       <View style={styles.body}>
         <View style={styles.holder}>
-          <Text style={styles.areaTitle}>Add Fossil</Text>
+          <Text style={styles.areaTitle}>Add Mineral</Text>
           <ScrollView
             style={styles.container}
             contentContainerStyle={styles.contentContainer}
@@ -249,7 +297,7 @@ const AddMineralScreen = (props) => {
                   onValueChange={(value) => handleType(value)}
                   style={styles.dropDown}
                 >
-                  {typeData.map((data) => {
+                  {speciesData.map((data) => {
                     return (
                       <Picker.Item
                         label={data.value}
@@ -308,7 +356,6 @@ const AddMineralScreen = (props) => {
                 onChangeText={(e) => handleCity(e)}
               ></TextInput>
             </View>
-
 
             <View style={styles.selection}>
               <Text style={styles.weightLabel}>Weight</Text>

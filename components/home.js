@@ -31,7 +31,7 @@ const HomeScreen = (props) => {
         <Image source={GeolibrumLogo} style={styles.image} />
         <View style={styles.box}>
           <Text style={styles.text}>Geolibrum</Text>
-          {!loggedIn && (
+          {loggedIn && (
             <View>
               <View>
                 <TouchableOpacity
@@ -53,7 +53,7 @@ const HomeScreen = (props) => {
               </View>
             </View>
           )}
-          {loggedIn && (
+          {!loggedIn && (
             <TouchableOpacity
               style={styles.button}
               onPress={() => {

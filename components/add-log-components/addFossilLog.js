@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Modal,
-  Alert
+  Alert,
 } from "react-native";
 
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
@@ -36,7 +36,25 @@ const AddFossilScreen = (props) => {
   const [colour, setColour] = useState("");
   const [imagesModalVisible, setImagesModalVisible] = useState(false);
 
+  useEffect(() => { loadDatabase();});
+  let count = 0;
+
+  const loadDatabase = async () => {
+    await db.ref("logs/").on("value", (snapshot) => {
+      var tasks = [];  
+      snapshot.forEach((child) => {
+        count++;
+      });
+
+      tasks.forEach((holder) => {
+        listHolder.push(holder);
+      });
+    });
+    newLog.id = count;
+  };
+
   const [newLog, setNewLog] = useState({
+    id: count,
     category: 1,
     type: "",
     date: "",
@@ -46,6 +64,7 @@ const AddFossilScreen = (props) => {
     upperTime: "",
     lowerTime: "",
     weight: "",
+    qrlink: "",
     images: [],
     certificate: [],
     colours: [],
@@ -64,14 +83,15 @@ const AddFossilScreen = (props) => {
     })();
   }, []);
 
-
   const gatherData = () => {
     newLog.colours = colourList;
     newLog.images = imagesList;
     newLog.certificate = certList;
-    console.log(newLog);
+    newLog.qrlink = `https://geolibrum.rocks/${newLog.category}/${newLog.type}/${newLog.id}`
 
-    db.ref('logs/').set({
+    db.ref("logs/").push(
+      {
+        id: newLog.id,
         category: newLog.category,
         type: newLog.type,
         date: newLog.date,
@@ -82,17 +102,15 @@ const AddFossilScreen = (props) => {
         lowerTime: newLog.lowerTime,
         weight: newLog.weight,
         images: newLog.images,
+        qrlink: newLog.qrlink,
         certificate: newLog.certificate,
-        colours: newLog.colours
-    });
-
-    Alert.alert(
-      "Success!",
-      "Your log has been added!",
-      [
-        { text: "OK", onPress: () => navigation.navigate("Home") }
-      ]
+        colours: newLog.colours,
+      }
     );
+
+    Alert.alert("Success!", "Your log has been added!", [
+      { text: "OK", onPress: () => navigation.navigate("Home") },
+    ]);
   };
 
   const handleImageModal = () => {

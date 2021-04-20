@@ -6,13 +6,8 @@ import HomeScreen from "./components/home";
 import LogScreen from "./components/logs";
 
 import ChooseTypeScreen from "./components/add-log-components/chooseType";
-import AddRockScreen from "./components/add-log-components/addRockLog";
-import AddFossilScreen from "./components/add-log-components/addFossilLog";
-import AddMineralScreen from "./components/add-log-components/addMineralLog";
+import AddLogScreen from "./components/add-log-components/addLog";
 import ViewLog from "./components/view-log-components/viewLog";
-
-import LoginScreen from "./components/sign-in-components/loginAccount";
-import RegisterScreen from "./components/sign-in-components/registerAccount";
 
 import { useFonts } from "@use-expo/font";
 
@@ -23,17 +18,17 @@ const customFonts = {
   NotoSans: require("./assets/fonts/NotoSans/NotoSans-Regular.ttf")
 };
 
-const isLoggedIn = (state) => {
-  setLoggedIn(state);
-}
-
 const setCurrentLog = (log) => {
   setLog(log);
 }
 
+const setTypes = (type) => {
+  setType(type);
+}
+
 const App = () => {
-  [loggedIn, setLoggedIn] = useState(false);
   [log, setLog] = useState();
+  [type, setType] = useState();
   const Stack = createStackNavigator();
   const [isLoaded] = useFonts(customFonts);
 
@@ -48,7 +43,6 @@ const App = () => {
           children={(props) => (
             <HomeScreen
               {...props}
-              loggedIn={loggedIn}
             />
           )}
           options={{ headerShown: false }}
@@ -69,52 +63,17 @@ const App = () => {
           children={(props) => (
             <ChooseTypeScreen
               {...props}
+              setType={setTypes}
             />
           )}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="AddRock"
+          name="AddLog"
           children={(props) => (
-            <AddRockScreen
+            <AddLogScreen
               {...props}
-            />
-          )}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddMineral"
-          children={(props) => (
-            <AddMineralScreen
-              {...props}
-            />
-          )}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddFossil"
-          children={(props) => (
-            <AddFossilScreen
-              {...props}
-            />
-          )}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Login"
-          children={(props) => (
-            <LoginScreen
-              {...props}
-              isLoggedIn={isLoggedIn}
-            />
-          )}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Register"
-          children={(props) => (
-            <RegisterScreen
-              {...props}
+              types={type}
             />
           )}
           options={{ headerShown: false }}

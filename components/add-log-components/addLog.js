@@ -26,36 +26,23 @@ import * as ImagePicker from "expo-image-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
 
-const AddFossilScreen = (props) => {
-  const { navigation } = props;
+const AddLog = (props) => {
+  const { navigation, types } = props;
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [colourList, setColourList] = useState([]);
   const [imagesList, setImageList] = useState([]);
   const [certList, setCertList] = useState([]);
   const [hasFile, setHasFile] = useState(false);
   const [colour, setColour] = useState("");
+  const [name, setName] = useState("");
+  const [fossil, setFossil] = useState(false);
   const [imagesModalVisible, setImagesModalVisible] = useState(false);
 
-  useEffect(() => { loadDatabase();});
   let count = 0;
-
-  const loadDatabase = async () => {
-    await db.ref("logs/").on("value", (snapshot) => {
-      var tasks = [];  
-      snapshot.forEach((child) => {
-        count++;
-      });
-
-      tasks.forEach((holder) => {
-        listHolder.push(holder);
-      });
-    });
-    newLog.id = count;
-  };
 
   const [newLog, setNewLog] = useState({
     id: count,
-    category: 1,
+    category: types,
     type: "",
     date: "",
     city: "",
@@ -71,6 +58,15 @@ const AddFossilScreen = (props) => {
   });
 
   useEffect(() => {
+    if (newLog.category == 0) {
+      setName("Mineral");
+    } else if (newLog.category == 1) {
+      setName("Fossil");
+      setFossil(true);
+    } else {
+      setName("Rock");
+    }
+
     (async () => {
       if (Platform.OS !== "web") {
         const {
@@ -87,26 +83,7 @@ const AddFossilScreen = (props) => {
     newLog.colours = colourList;
     newLog.images = imagesList;
     newLog.certificate = certList;
-    newLog.qrlink = `https://geolibrum.rocks/${newLog.category}/${newLog.type}/${newLog.id}`
-
-    db.ref("logs/").push(
-      {
-        id: newLog.id,
-        category: newLog.category,
-        type: newLog.type,
-        date: newLog.date,
-        city: newLog.city,
-        region: newLog.region,
-        country: newLog.country,
-        upperTime: newLog.upperTime,
-        lowerTime: newLog.lowerTime,
-        weight: newLog.weight,
-        images: newLog.images,
-        qrlink: newLog.qrlink,
-        certificate: newLog.certificate,
-        colours: newLog.colours,
-      }
-    );
+    newLog.qrlink = `https://geolibrum.rocks/${newLog.category}/${newLog.type}/${newLog.id}`;
 
     Alert.alert("Success!", "Your log has been added!", [
       { text: "OK", onPress: () => navigation.navigate("Home") },
@@ -253,7 +230,7 @@ const AddFossilScreen = (props) => {
 
       <View style={styles.body}>
         <View style={styles.holder}>
-          <Text style={styles.areaTitle}>Add Fossil</Text>
+          <Text style={styles.areaTitle}>Add {name}</Text>
           <ScrollView
             style={styles.container}
             contentContainerStyle={styles.contentContainer}
@@ -364,24 +341,30 @@ const AddFossilScreen = (props) => {
               ></TextInput>
             </View>
 
-            <View style={styles.selection}>
-              <Text style={styles.timeLabel}>Time Period Range</Text>
-            </View>
-            <View style={styles.lowerSelection}>
-              <TextInput
-                onChangeText={(e) => handleTimeLower(e)}
-                placeholder="0"
-                keyboardType="numeric"
-              ></TextInput>
-            </View>
-            <Text style={styles.dashText}>-</Text>
-            <View style={styles.upperSelection}>
-              <TextInput
-                onChangeText={(e) => handleTimeUpper(e)}
-                placeholder="0"
-                keyboardType="numeric"
-              ></TextInput>
-            </View>
+            {fossil && (
+              <View>
+                <View style={styles.selection}>
+                  <Text style={styles.timeLabel}>Time Period Range</Text>
+                </View>
+                <View>
+                  <View style={styles.lowerSelection}>
+                    <TextInput
+                      onChangeText={(e) => handleTimeLower(e)}
+                      placeholder="0"
+                      keyboardType="numeric"
+                    ></TextInput>
+                  </View>
+                  <Text style={styles.dashText}>-</Text>
+                  <View style={styles.upperSelection}>
+                    <TextInput
+                      onChangeText={(e) => handleTimeUpper(e)}
+                      placeholder="0"
+                      keyboardType="numeric"
+                    ></TextInput>
+                  </View>
+                </View>
+              </View>
+            )}
 
             <View style={styles.selection}>
               <Text style={styles.weightLabel}>Weight</Text>
@@ -409,7 +392,7 @@ const AddFossilScreen = (props) => {
             </View>
 
             {colourList.map((item, index) => (
-              <View style={styles.displayColour}>
+              <View style={styles.displayColour} key={index}>
                 <Text style={styles.textColour}>{item}</Text>
                 <TouchableOpacity
                   onPress={() => deleteColours(item)}
@@ -469,9 +452,9 @@ const ImageModal = (props) => {
             </View>
           )}
           {imagesList.length > 0 &&
-            imagesList.map((image) => {
+            imagesList.map((image, key) => {
               return (
-                <View contentContainerStyle={styles.modalScrollView}>
+                <View contentContainerStyle={styles.modalScrollView} key={key}>
                   <TouchableOpacity onPress={() => deleteImage(image)}>
                     <Image
                       style={styles.modalImage}
@@ -513,4 +496,4 @@ const ImageModal = (props) => {
   );
 };
 
-export default AddFossilScreen;
+export default AddLog;

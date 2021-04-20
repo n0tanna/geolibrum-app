@@ -4,13 +4,11 @@ import {
   TouchableOpacity,
   Image,
   View,
-  SafeAreaView,
-  FlatList,
   ScrollView,
   Picker,
   TextInput,
-  Alert,
-} from "react-native";
+  Modal,
+} from "react-native"; 
 
 import styles from "../../styles/view-log-styles.js";
 import GeolibrumLogo from "../../assets/Photos/Illustrated/geolibrum-logo.png";
@@ -30,12 +28,6 @@ import TypeWriter from "react-native-typewriter";
 const ViewLogScreen = (props) => {
   const { navigation, currentLog } = props;
 
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [colourList, setColourList] = useState([]);
-  const [imagesList, setImageList] = useState([]);
-  const [certList, setCertList] = useState([]);
-  const [hasFile, setHasFile] = useState(false);
-  const [colour, setColour] = useState("");
   const [imagesModalVisible, setImagesModalVisible] = useState(false);
 
   const [newLog, setNewLog] = useState({
@@ -61,71 +53,8 @@ const ViewLogScreen = (props) => {
     setImagesModalVisible(!imagesModalVisible);
   };
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setImageList([...imagesList, { uri: result.uri }]);
-      await setHasFile(true);
-    }
-  };
-
-  const takeImage = async () => {
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setImageList([...imagesList, { uri: result.uri }]);
-      await setHasFile(true);
-    }
-  };
-
-  const pickedDocument = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setCertList([...certList, { uri: result.uri }]);
-      await setHasFile(true);
-    }
-  };
-
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirm = (date) => {
-    let year = moment(date).format("YYYY");
-    let month = moment(date).format("MM");
-    let day = moment(date).format("DD");
-
-    newLog.date = year + "-" + month + "-" + day;
-    hideDatePicker();
-  };
-
   const handleSpecies = (e) => {
     newLog.type = e;
-  };
-
-  const handleColour = (e) => {
-    setColour(e);
   };
 
   const handleCountry = (e) => {
@@ -152,29 +81,6 @@ const ViewLogScreen = (props) => {
     newLog.weight = e;
   };
 
-  const addColourToList = () => {
-    setColourList([...colourList, colour]);
-    setColour();
-  };
-
-  const deleteColours = (holder) => {
-    setColourList(colourList.filter((item) => item !== holder));
-  };
-
-  const deleteImage = async (holder) => {
-    setImageList(imagesList.filter((item) => item !== holder));
-    if (certList.length === 0 && imagesList.length === 1) {
-      await setHasFile(false);
-    }
-  };
-
-  const deleteCert = async (holder) => {
-    setCertList(certList.filter((item) => item !== holder));
-    if (certList.length === 1 && imagesList.length === 0) {
-      await setHasFile(false);
-    }
-  };
-
   return (
     <View style={styles.header}>
       <View>
@@ -184,194 +90,210 @@ const ViewLogScreen = (props) => {
         </TypeWriter>
       </View>
 
+      <ImageModal
+        imagesList={newLog.images}
+        certList={newLog.certificate}
+        handleImageModal={handleImageModal}
+        showImageModal={imagesModalVisible}
+      />
+
       <View style={styles.body}>
         <View style={styles.holder}>
-            <Text style={styles.areaTitle}>Log #{currentLog.id}</Text>
-            <ScrollView
-              style={styles.container}
-              contentContainerStyle={styles.contentContainer}
-            >
-              <View style={styles.camera}>
-                <TouchableOpacity
-                  style={styles.imageBackground}
-                  onPress={takeImage}
-                >
-                  <Image style={styles.imageLogosTop} source={CameraLogo} />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.photo}>
-                <TouchableOpacity
-                  style={styles.imageBackground}
-                  onPress={pickImage}
-                >
-                  <Image style={styles.imageLogosTop} source={PhotoLogo} />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.document}>
-                <TouchableOpacity
-                  style={styles.imageBackground}
-                  onPress={pickedDocument}
-                >
-                  <Image style={styles.imageLogosTop} source={DocumentLogo} />
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.selection}>
-                {hasFile && (
-                  <TouchableOpacity
-                    onPress={handleImageModal}
-                    style={styles.buttonLabel}
-                  >
-                    <Text style={styles.buttonText}>View Images</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              <View style={styles.selection}>
-                <Text style={styles.speciesLabel}>Species</Text>
-                <View style={styles.speciesPicker}>
-                  <Picker
-                    selectedValue={newLog.type}
-                    onValueChange={(value) => handleSpecies(value)}
-                    style={styles.dropDown}
-                  >
-                    {speciesData.map((data) => {
-                      return (
-                        <Picker.Item
-                          label={data.value}
-                          value={data.value}
-                          key={data.value}
-                        />
-                      );
-                    })}
-                  </Picker>
-                </View>
-              </View>
-
-              <View style={styles.selection}>
-                <Text style={styles.dateLabel}>Date</Text>
-                <Text style={styles.date}>{newLog.date}</Text>
-                <View style={styles.dateImage}>
-                  <TouchableOpacity
-                    style={styles.dateBackground}
-                    onPress={showDatePicker}
-                  >
-                    <Image style={styles.imageLogoDate} source={CalendarLogo} />
-                  </TouchableOpacity>
-                </View>
-                <DateTimePickerModal
-                  isVisible={isDatePickerVisible}
-                  mode="date"
-                  onConfirm={handleConfirm}
-                  onCancel={hideDatePicker}
-                  dateFormat="YYYY-MM-DD"
-                />
-              </View>
-
-              <View style={styles.selection}>
-                <Text style={styles.countryLabel}>Country</Text>
-                <TextInput
-                  style={styles.selectionText}
-                  placeholder={currentLog.country}
-                  onChangeText={(e) => handleCountry(e)}
-                ></TextInput>
-              </View>
-
-              <View style={styles.selection}>
-                <Text style={styles.regionLabel}>Region</Text>
-                <TextInput
-                  style={styles.selectionText}
-                  placeholder={currentLog.region}
-                  onChangeText={(e) => handleRegion(e)}
-                ></TextInput>
-              </View>
-
-              <View style={styles.selection}>
-                <Text style={styles.cityLabel}>City</Text>
-                <TextInput
-                  style={styles.selectionText}
-                  placeholder={currentLog.city}
-                  onChangeText={(e) => handleCity(e)}
-                ></TextInput>
-              </View>
-
-              <View style={styles.selection}>
-                <Text style={styles.timeLabel}>Time Period Range</Text>
-              </View>
-              <View style={styles.lowerSelection}>
-                <TextInput
-                  onChangeText={(e) => handleTimeLower(e)}
-                  placeholder={currentLog.lowerTime}
-                  keyboardType="numeric"
-                ></TextInput>
-              </View>
-              <Text style={styles.dashText}>-</Text>
-              <View style={styles.upperSelection}>
-                <TextInput
-                  onChangeText={(e) => handleTimeUpper(e)}
-                  placeholder={currentLog.upperTime}
-                  keyboardType="numeric"
-                ></TextInput>
-              </View>
-
-              <View style={styles.selection}>
-                <Text style={styles.weightLabel}>Weight</Text>
-                <TextInput
-                  style={styles.selectionText}
-                  placeholder={currentLog.weight}
-                  keyboardType="numeric"
-                  onChangeText={(e) => handleWeight(e)}
-                ></TextInput>
-              </View>
-
-              <View style={styles.selection}>
-                <Text style={styles.colourLabel}>Colour(s)</Text>
-                <TextInput
-                  style={styles.selectionText}
-                  placeholder="colour name"
-                  onChangeText={(e) => handleColour(e)}
-                />
-                <TouchableOpacity
-                  onPress={addColourToList}
-                  style={styles.plusIcon}
-                >
-                  <Text style={styles.plusIconText}>+</Text>
-                </TouchableOpacity>
-              </View>
-
-              {colourList.map((item, index) => (
-                <View style={styles.displayColour}>
-                  <Text style={styles.textColour}>{item}</Text>
-                  <TouchableOpacity
-                    onPress={() => deleteColours(item)}
-                    style={styles.deleteColour}
-                  >
-                    <Text style={styles.deleteText}>x</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </ScrollView>
-            <View style={styles.add}>
-              <TouchableOpacity>
-                <Image style={styles.imageArrow} source={Edit} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.back}>
+          <Text style={styles.areaTitle}>Log #{currentLog.id}</Text>
+          <ScrollView  
+            style={styles.container}
+            contentContainerStyle={styles.contentContainer}
+          >
+            <View style={styles.selection}>
               <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("Home");
-                }}
+                onPress={handleImageModal}
+                style={styles.buttonLabel}
               >
-                <Image style={styles.imageArrow} source={Back} />
+                <Text style={styles.buttonText}>View Images</Text>
               </TouchableOpacity>
             </View>
+
+            <View style={styles.selection}>
+              <Text style={styles.speciesLabel}>Species</Text>
+              <View style={styles.speciesPicker}>
+                <Picker
+                  selectedValue={newLog.type}
+                  onValueChange={(value) => handleSpecies(value)}
+                  style={styles.dropDown}
+                >
+                  {speciesData.map((data) => {
+                    return (
+                      <Picker.Item
+                        label={data.value}
+                        value={data.value}
+                        key={data.value}
+                      />
+                    );
+                  })}
+                </Picker>
+              </View>
+            </View>
+
+            <View style={styles.selection}>
+              <Text style={styles.dateLabel}>Date</Text>
+              <Text style={styles.date}>{newLog.date}</Text>
+              <View style={styles.dateImage}>
+                <TouchableOpacity
+                  style={styles.dateBackground}
+                >
+                  <Image style={styles.imageLogoDate} source={CalendarLogo} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.selection}>
+              <Text style={styles.countryLabel}>Country</Text>
+              <TextInput
+                style={styles.selectionText}
+                placeholder={currentLog.country}
+                onChangeText={(e) => handleCountry(e)}
+              ></TextInput>
+            </View>
+
+            <View style={styles.selection}>
+              <Text style={styles.regionLabel}>Region</Text>
+              <TextInput
+                style={styles.selectionText}
+                placeholder={currentLog.region}
+                onChangeText={(e) => handleRegion(e)}
+              ></TextInput>
+            </View>
+
+            <View style={styles.selection}>
+              <Text style={styles.cityLabel}>City</Text>
+              <TextInput
+                style={styles.selectionText}
+                placeholder={currentLog.city}
+                onChangeText={(e) => handleCity(e)}
+              ></TextInput>
+            </View>
+
+            <View style={styles.selection}>
+              <Text style={styles.timeLabel}>Time Period Range</Text>
+            </View>
+            <View style={styles.lowerSelection}>
+              <TextInput
+                onChangeText={(e) => handleTimeLower(e)}
+                placeholder={currentLog.lowerTime}
+                keyboardType="numeric"
+              ></TextInput>
+            </View>
+            <Text style={styles.dashText}>-</Text>
+            <View style={styles.upperSelection}>
+              <TextInput
+                onChangeText={(e) => handleTimeUpper(e)}
+                placeholder={currentLog.upperTime}
+                keyboardType="numeric"
+              ></TextInput>
+            </View>
+
+            <View style={styles.selection}>
+              <Text style={styles.weightLabel}>Weight</Text>
+              <TextInput
+                style={styles.selectionText}
+                placeholder={currentLog.weight}
+                keyboardType="numeric"
+                onChangeText={(e) => handleWeight(e)}
+              ></TextInput>
+            </View>
+
+            <Text style={styles.colourLabel}>Colour(s)</Text>
+
+            {newLog.colours && newLog.colours.map((item, index) => (
+              <View style={styles.displayColour} key={index}>
+                <Text style={styles.textColour}>{item}</Text>
+                <TouchableOpacity style={styles.deleteColour}>
+                  <Text style={styles.deleteText}>x</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+          <View style={styles.back}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Home");
+              }}
+            >
+              <Image style={styles.imageArrow} source={Back} />
+            </TouchableOpacity>
           </View>
+        </View>
       </View>
     </View>
   );
-};
+            };
 
+  const ImageModal = (props) => {
+    const {
+      handleImageModal,
+      showImageModal,
+      certList,
+      imageList,
+    } = props;
+
+    return (
+      <Modal
+        animationType={"slide"}
+        transparent={true}
+        visible={showImageModal}
+        onRequestClose={() => {
+          handleImageModal();
+        }}
+      >
+        <View style={styles.imageModal}>
+          <ScrollView>
+            {imageList && (imageList.length > 0 && (
+              <View style={styles.modalTitleArea}>
+                <Text style={styles.modalTitle}>Images</Text>
+              </View>
+            ))}
+            {imageList && (imageList.length > 0 &&
+              imageList.map((image) => {
+                return (
+                  <View contentContainerStyle={styles.modalScrollView}>
+                    <TouchableOpacity>
+                      <Image
+                        style={styles.modalImage}
+                        source={{ uri: image.uri }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                );
+              }))}
+            {certList && (certList.length > 0 && (
+              <View style={styles.modalTitleArea}>
+                <Text style={styles.modalTitle}>Certificates</Text>
+              </View>
+            ))}
+            {certList && (certList.length > 0 &&
+              certList.map((image) => {
+                return (
+                  <View>
+                    <TouchableOpacity>
+                      <Image
+                        style={styles.modalImage}
+                        source={{ uri: image.uri }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                );
+              }))}
+            <View>
+              <TouchableOpacity
+                style={styles.modalButtonLabel}
+                onPress={handleImageModal}
+              >
+                <Text style={styles.modalButtonText}>Return</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+    );
+};
 export default ViewLogScreen;

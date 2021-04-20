@@ -13,17 +13,7 @@ import GeolibrumLogo from "../assets/Photos/Illustrated/geolibrum-logo.png";
 import { db, firestore, auth } from "../database/databaseConfig";
 
 const HomeScreen = (props) => {
-  const { navigation, loggedIn} = props;
-
-  signoutWithFirebase = () => {
-    auth.signOut().then(function () {
-      // if logout was successful
-      if (!auth.currentUser) {
-        Alert.alert("user was logged out!");
-        setLoggedIn(false);
-      }
-    });
-  };
+  const { navigation } = props;
 
   return (
     <View style={styles.container}>
@@ -31,29 +21,7 @@ const HomeScreen = (props) => {
         <Image source={GeolibrumLogo} style={styles.image} />
         <View style={styles.box}>
           <Text style={styles.text}>Geolibrum</Text>
-          {loggedIn && (
             <View>
-              <View>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    navigation.navigate("Register");
-                  }}
-                >
-                  <Text style={styles.buttonText}>Register</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    navigation.navigate("Login");
-                  }}
-                >
-                  <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-          {!loggedIn && (
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
@@ -62,7 +30,7 @@ const HomeScreen = (props) => {
             >
               <Text style={styles.buttonText}>Logs</Text>
             </TouchableOpacity>
-          )}
+            </View>
         </View>
       </View>
     </View>

@@ -9,7 +9,7 @@ import RockLogo from "../../assets/Photos/Illustrated/rock-logo.png";
 import Back from "../../assets/Photos/Illustrated/back-logo.png";
 
 const ChooseTypeScreen = (props) => {
-  const { navigation } = props;
+  const { navigation, setType } = props;
 
   return (
     <View style={styles.header}>
@@ -24,21 +24,24 @@ const ChooseTypeScreen = (props) => {
           <Text style={styles.areaTitle}>Log Type</Text>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("AddFossil");
+              setType(1);
+              navigation.navigate("AddLog");
             }}
           >
             <Image style={styles.logImage} source={FossilLogo} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("AddMineral");
+              setType(0);
+              navigation.navigate("AddLog");
             }}
           >
             <Image style={styles.logImage} source={MineralLogo} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("AddRock");
+              setType(2);
+              navigation.navigate("AddLog");
             }}
           >
             <Image style={styles.logImage} source={RockLogo} />
